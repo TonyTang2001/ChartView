@@ -114,10 +114,10 @@ public struct Styles {
         dropShadowColor: Color.gray)
     
     public static let pieChartStyleOne = ChartStyle(
-        backgroundColor: Color.white,
+        backgroundColor: Color(UIColor.systemBackground),
         accentColor: Colors.OrangeEnd,
         secondGradientColor: Colors.OrangeStart,
-        textColor: Color.black,
+        textColor: Color(UIColor.label),
         legendTextColor: Color.gray,
         dropShadowColor: Color.gray)
     
