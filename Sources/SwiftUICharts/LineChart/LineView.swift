@@ -9,7 +9,7 @@
 import SwiftUI
 
 public struct LineView: View {
-    @ObservedObject var data: ChartData
+    @ObservedObject var data: ChartDataArray
     public var title: String?
     public var legend: String?
     public var style: ChartStyle
@@ -25,13 +25,18 @@ public struct LineView: View {
     @State private var currentDataNumber: Double = 0
     @State private var hideHorizontalLines: Bool = false
     
-    public init(data: [Double],
+    public init(data: [[Double]],
                 title: String? = nil,
                 legend: String? = nil,
                 style: ChartStyle = Styles.lineChartStyleOne,
                 valueSpecifier: String? = "%.1f") {
         
-        self.data = ChartData(points: data)
+        var chartDataArray = [ChartData]()
+        
+        data.forEach { dataArray in
+            chartDataArray.append(ChartData(points: dataArray))
+        }
+        self.data = ChartDataArray(chartDataArray)
         self.title = title
         self.legend = legend
         self.style = style
@@ -54,35 +59,41 @@ public struct LineView: View {
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.legendTextColor : self.style.legendTextColor)
                     }
                 }.offset(x: 0, y: 20)
+                
                 ZStack{
                     GeometryReader{ reader in
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
+                        
                         if(self.showLegend){
-                            Legend(data: self.data,
+                            Legend(data: getMergedDataForLegend(),
                                    frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
                                 .transition(.opacity)
                                 .animation(Animation.easeOut(duration: 1).delay(1))
                         }
-                        Line(data: self.data,
-                             frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
-                             touchLocation: self.$indicatorLocation,
-                             showIndicator: self.$hideHorizontalLines,
-                             minDataValue: .constant(nil),
-                             maxDataValue: .constant(nil),
-                             showBackground: false,
-                             gradient: self.style.gradientColor
-                        )
-                        .offset(x: 30, y: -20)
-                        .onAppear(){
-                            self.showLegend = true
-                        }
-                        .onDisappear(){
-                            self.showLegend = false
+                        
+                        ForEach(self.data.dataArray) { data in
+                            Line(data: data,
+                                 frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
+                                 touchLocation: self.$indicatorLocation,
+                                 showIndicator: self.$hideHorizontalLines,
+                                 minDataValue: .constant(nil),
+                                 maxDataValue: .constant(nil),
+                                 showBackground: false,
+                                 gradient: self.style.gradientColor
+                            )
+                            .offset(x: 30, y: -20)
+                            .onAppear(){
+                                self.showLegend = true
+                            }
+                            .onDisappear(){
+                                self.showLegend = false
+                            }
                         }
                     }
                     .frame(width: geometry.frame(in: .local).size.width, height: 240)
-                    .offset(x: 0, y: 40 )
+                    .offset(x: 0, y: 40)
+                    
                     MagnifierRect(currentNumber: self.$currentDataNumber, valueSpecifier: self.valueSpecifier)
                         .opacity(self.opacity)
                         .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
@@ -106,7 +117,7 @@ public struct LineView: View {
     }
     
     func getClosestDataPoint(toPoint: CGPoint, width:CGFloat, height: CGFloat) -> CGPoint {
-        let points = self.data.onlyPoints()
+        let points = self.data.dataArray[0].onlyPoints()
         let stepWidth: CGFloat = width / CGFloat(points.count-1)
         let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
         
@@ -117,14 +128,18 @@ public struct LineView: View {
         }
         return .zero
     }
+    
+    func getMergedDataForLegend() -> ChartData {
+        return ChartData(values: data.dataArray)
+    }
 }
 
 struct LineView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            LineView(data: [8,23,54,32,12,37,7,23,43], title: "Full chart", style: Styles.lineChartStyleOne)
+            LineView(data: [[8,23,54,32,12,37,7,23,43]], title: "Full chart", style: Styles.lineChartStyleOne)
             
-            LineView(data: [282.502, 284.495, 283.51, 285.019, 285.197, 286.118, 288.737, 288.455, 289.391, 287.691, 285.878, 286.46, 286.252, 284.652, 284.129, 284.188], title: "Full chart", style: Styles.lineChartStyleOne)
+            LineView(data: [[282.502, 284.495, 283.51, 285.019, 285.197, 286.118, 288.737, 288.455, 289.391, 287.691, 285.878, 286.46, 286.252, 284.652, 284.129, 284.188]], title: "Full chart", style: Styles.lineChartStyleOne)
             
         }
     }

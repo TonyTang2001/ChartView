@@ -183,6 +183,14 @@ public class ChartStyle {
     }
 }
 
+public class ChartDataArray: ObservableObject, Identifiable {
+    @Published var dataArray: [ChartData]
+    
+    public init(_ array: [ChartData]) {
+        self.dataArray = array
+    }
+}
+
 public class ChartData: ObservableObject, Identifiable {
     @Published var points: [(String,Double)]
     var valuesGiven: Bool = false
@@ -205,6 +213,14 @@ public class ChartData: ObservableObject, Identifiable {
     }
     public init<N: BinaryFloatingPoint & LosslessStringConvertible>(numberValues:[(N,N)]){
         self.points = numberValues.map{(String($0.0), Double($0.1))}
+        self.valuesGiven = true
+    }
+    public init<N: ChartData>(values:[N]){
+        var mergedPoints = [(String,Double)]()
+        for chartData in values {
+            mergedPoints.append(contentsOf: chartData.points)
+        }
+        self.points = mergedPoints
         self.valuesGiven = true
     }
     

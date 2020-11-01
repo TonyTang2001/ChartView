@@ -68,66 +68,63 @@ public struct MultiLineChartView: View {
     }
     
     public var body: some View {
-        ZStack(alignment: .center){
-            RoundedRectangle(cornerRadius: 20)
-                .fill(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
-                .frame(width: frame.width, height: 240, alignment: .center)
-                .shadow(radius: self.dropShadow ? 8 : 0)
-            VStack(alignment: .leading){
-                if(!self.showIndicatorDot){
-                    VStack(alignment: .leading, spacing: 8){
-                        Text(self.title)
-                            .font(.title)
-                            .bold()
-                            .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.textColor : self.style.textColor)
-                        if (self.legend != nil){
-                            Text(self.legend!)
-                                .font(.callout)
-                                .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.legendTextColor : self.style.legendTextColor)
-                        }
-                        HStack {
-                            if (rateValue ?? 0 >= 0){
-                                Image(systemName: "arrow.up")
-                            }else{
-                                Image(systemName: "arrow.down")
-                            }
-                            Text("\(rateValue ?? 0)%")
-                        }
+        VStack(alignment: .leading){
+            if(!self.showIndicatorDot){
+                VStack(alignment: .leading, spacing: 8){
+                    Text(self.title)
+                        .font(.title)
+                        .bold()
+                        .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.textColor : self.style.textColor)
+                    if (self.legend != nil){
+                        Text(self.legend!)
+                            .font(.callout)
+                            .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.legendTextColor : self.style.legendTextColor)
                     }
-                    .transition(.opacity)
-                    .animation(.easeIn(duration: 0.1))
-                    .padding([.leading, .top])
-                }else{
-                    HStack{
-                        Spacer()
-                        Text("\(self.currentValue, specifier: self.valueSpecifier)")
-                            .font(.system(size: 41, weight: .bold, design: .default))
-                            .offset(x: 0, y: 30)
-                        Spacer()
-                    }
-                    .transition(.scale)
-                }
-                Spacer()
-                GeometryReader{ geometry in
-                    ZStack{
-                        ForEach(0..<self.data.count) { i in
-                            Line(data: self.data[i],
-                                 frame: .constant(geometry.frame(in: .local)),
-                                 touchLocation: self.$touchLocation,
-                                 showIndicator: self.$showIndicatorDot,
-                                 minDataValue: .constant(self.globalMin),
-                                 maxDataValue: .constant(self.globalMax),
-                                 showBackground: false,
-                                 gradient: self.data[i].getGradient(),
-                                 index: i)
+                    HStack {
+                        if (rateValue ?? 0 >= 0){
+                            Image(systemName: "arrow.up")
+                        }else{
+                            Image(systemName: "arrow.down")
                         }
+                        Text("\(rateValue ?? 0)%")
                     }
                 }
-                .frame(width: frame.width, height: frame.height + 30)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .offset(x: 0, y: 0)
-            }.frame(width: self.formSize.width, height: self.formSize.height)
-        }
+                .transition(.opacity)
+                .animation(.easeIn(duration: 0.1))
+                .padding([.leading, .top])
+            }else{
+                HStack{
+                    Spacer()
+                    Text("\(self.currentValue, specifier: self.valueSpecifier)")
+                        .font(.system(size: 41, weight: .bold, design: .default))
+                        .offset(x: 0, y: 30)
+                    Spacer()
+                }
+                .transition(.scale)
+            }
+            Spacer()
+            GeometryReader{ geometry in
+                ZStack{
+                    Legend(data: getMergedDataForLegend(),
+                           frame: .constant(geometry.frame(in: .local)), hideHorizontalLines: .constant(false))
+                        .transition(.opacity)
+                        .animation(Animation.easeOut(duration: 1).delay(1))
+                    
+                    ForEach(0..<self.data.count) { i in
+                        Line(data: self.data[i],
+                             frame: .constant(geometry.frame(in: .local)),
+                             touchLocation: self.$touchLocation,
+                             showIndicator: self.$showIndicatorDot,
+                             minDataValue: .constant(self.globalMin),
+                             maxDataValue: .constant(self.globalMax),
+                             showBackground: false,
+                             gradient: self.data[i].getGradient(),
+                             index: i)
+                    }
+                }
+            }
+            .offset(x: 0, y: 0)
+        }.frame(width: self.formSize.width, height: self.formSize.height)
         .gesture(DragGesture()
         .onChanged({ value in
 //            self.touchLocation = value.location
@@ -152,6 +149,11 @@ public struct MultiLineChartView: View {
 //        }
 //        return .zero
 //    }
+    
+    func getMergedDataForLegend() -> ChartData {
+        return ChartData(values: data)
+    }
+    
 }
 
 struct MultiWidgetView_Previews: PreviewProvider {
