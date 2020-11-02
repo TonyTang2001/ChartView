@@ -17,12 +17,12 @@ public struct LineView: View {
     public var valueSpecifier:String
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @State private var showLegend = false
+    @State private var showLegend = true
     @State private var dragLocation:CGPoint = .zero
     @State private var indicatorLocation:CGPoint = .zero
     @State private var closestPoint: CGPoint = .zero
     @State private var opacity:Double = 0
-    @State private var currentDataNumber: Double = 0
+    @State private var currentDataNumbers: [Double] = [0, 0]
     @State private var hideHorizontalLines: Bool = false
     
     public init(data: [[Double]],
@@ -36,7 +36,7 @@ public struct LineView: View {
         data.forEach { dataArray in
             chartDataArray.append(ChartData(points: dataArray))
         }
-        self.data = ChartDataArray(chartDataArray)
+        self.data = ChartDataArray(from: chartDataArray, of: [Styles.lineChartStyleOne.gradientColor, Styles.barChartStyleNeonBlueLight.gradientColor])
         self.title = title
         self.legend = legend
         self.style = style
@@ -65,22 +65,20 @@ public struct LineView: View {
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
                         
-                        if(self.showLegend){
-                            Legend(data: getMergedDataForLegend(),
-                                   frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
-                                .transition(.opacity)
-                                .animation(Animation.easeOut(duration: 1).delay(1))
-                        }
+                        Legend(data: getMergedDataForLegend(),
+                               frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
+                            .transition(.opacity)
+                            .animation(Animation.easeOut(duration: 1).delay(1))
                         
                         ForEach(self.data.dataArray) { data in
                             Line(data: data,
                                  frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
                                  touchLocation: self.$indicatorLocation,
                                  showIndicator: self.$hideHorizontalLines,
-                                 minDataValue: .constant(nil),
-                                 maxDataValue: .constant(nil),
+                                 minDataValue: .constant(getMergedDataForLegend().onlyPoints().min()),
+                                 maxDataValue: .constant(getMergedDataForLegend().onlyPoints().max()),
                                  showBackground: false,
-                                 gradient: self.style.gradientColor
+                                 gradient: getLineGradient(of: data)
                             )
                             .offset(x: 30, y: -20)
                             .onAppear(){
@@ -94,7 +92,7 @@ public struct LineView: View {
                     .frame(width: geometry.frame(in: .local).size.width, height: 240)
                     .offset(x: 0, y: 40)
                     
-                    MagnifierRect(currentNumber: self.$currentDataNumber, valueSpecifier: self.valueSpecifier)
+                    MagnifierRect(currentNumber1: self.$currentDataNumbers[0], currentNumber2: self.$currentDataNumbers[1], valueSpecifier: self.valueSpecifier)
                         .opacity(self.opacity)
                         .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
                 }
@@ -116,15 +114,26 @@ public struct LineView: View {
         }
     }
     
+    func getLineGradient(of data: ChartData) -> GradientColor {
+        let allData = self.data.dataArray
+        let index = allData.firstIndex { chartData -> Bool in
+            chartData == data
+        } ?? 0
+        
+        return self.data.gradient[index]
+    }
+    
     func getClosestDataPoint(toPoint: CGPoint, width:CGFloat, height: CGFloat) -> CGPoint {
-        let points = self.data.dataArray[0].onlyPoints()
-        let stepWidth: CGFloat = width / CGFloat(points.count-1)
-        let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
+        let points1 = self.data.dataArray[0].onlyPoints()
+        let points2 = self.data.dataArray[1].onlyPoints()
+        
+        let stepWidth: CGFloat = width / CGFloat(points1.count-1)
+        let stepHeight: CGFloat = height / CGFloat(points1.max()! + points1.min()!)
         
         let index:Int = Int(floor((toPoint.x-15)/stepWidth))
-        if (index >= 0 && index < points.count){
-            self.currentDataNumber = points[index]
-            return CGPoint(x: CGFloat(index)*stepWidth, y: CGFloat(points[index])*stepHeight)
+        if (index >= 0 && index < points1.count){
+            self.currentDataNumbers = [points1[index], points2[index]]
+            return CGPoint(x: CGFloat(index)*stepWidth, y: CGFloat(points1[index])*stepHeight)
         }
         return .zero
     }

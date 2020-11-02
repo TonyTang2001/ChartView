@@ -185,13 +185,19 @@ public class ChartStyle {
 
 public class ChartDataArray: ObservableObject, Identifiable {
     @Published var dataArray: [ChartData]
+    @Published var gradient: [GradientColor]
     
-    public init(_ array: [ChartData]) {
+    public init(from array: [ChartData], of gradient: [GradientColor]) {
         self.dataArray = array
+        self.gradient  = gradient
     }
 }
 
-public class ChartData: ObservableObject, Identifiable {
+public class ChartData: ObservableObject, Identifiable, Equatable {
+    public static func == (lhs: ChartData, rhs: ChartData) -> Bool {
+        return lhs.onlyPoints() == rhs.onlyPoints()
+    }
+    
     @Published var points: [(String,Double)]
     var valuesGiven: Bool = false
     var ID = UUID()

@@ -16,10 +16,12 @@ public struct Line: View {
     @Binding var minDataValue: Double?
     @Binding var maxDataValue: Double?
     @State private var showFull: Bool = false
-    @State var showBackground: Bool = true
+    @State var showBackground: Bool = false
+    
+    var animate: Bool = true
     var gradient: GradientColor = GradientColor(start: Colors.GradientPurple, end: Colors.GradientNeonBlue)
-    var index:Int = 0
-    let padding:CGFloat = 30
+    var index: Int = 0
+    var padding: CGFloat = 30
     var curvedLines: Bool = true
     var stepWidth: CGFloat {
         if data.points.count < 2 {
@@ -58,6 +60,31 @@ public struct Line: View {
         return curvedLines ? Path.quadClosedCurvedPathWithPoints(points: points, step: CGPoint(x: stepWidth, y: stepHeight), globalOffset: minDataValue) : Path.closedLinePathWithPoints(points: points, step: CGPoint(x: stepWidth, y: stepHeight))
     }
     
+    public init(data: ChartData,
+                frame: Binding<CGRect>,
+                touchLocation: Binding<CGPoint>,
+                showIndicator: Binding<Bool>,
+                minDataValue: Binding<Double?>,
+                maxDataValue: Binding<Double?>,
+                showBackground: Bool = false,
+                gradient: GradientColor = GradientColor(start: Colors.GradientPurple, end: Colors.GradientNeonBlue),
+                index: Int = 0,
+                padding: CGFloat = 30,
+                animate: Bool = true) {
+        
+        self.data = data
+        self._frame = frame
+        self._touchLocation = touchLocation
+        self._showIndicator = showIndicator
+        self._minDataValue = minDataValue
+        self._maxDataValue = maxDataValue
+        self.showBackground = showBackground
+        self.gradient = gradient
+        self.index = index
+        self.padding = padding
+        self.animate = animate
+    }
+    
     public var body: some View {
         ZStack {
             if(self.showFull && self.showBackground){
@@ -66,14 +93,14 @@ public struct Line: View {
                     .rotationEffect(.degrees(180), anchor: .center)
                     .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
                     .transition(.opacity)
-                    .animation(.easeIn(duration: 1.6))
+                    .animation(animate ? .easeIn(duration: 1.2) : nil)
             }
             self.path
                 .trim(from: 0, to: self.showFull ? 1:0)
                 .stroke(LinearGradient(gradient: gradient.getGradient(), startPoint: .leading, endPoint: .trailing) ,style: StrokeStyle(lineWidth: 3, lineJoin: .round))
                 .rotationEffect(.degrees(180), anchor: .center)
                 .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-                .animation(Animation.easeOut(duration: 1.2).delay(Double(self.index)*0.4))
+                .animation(animate ? Animation.easeOut(duration: 1.2).delay(Double(self.index)*0.3) : nil)
                 .onAppear {
                     self.showFull = true
             }

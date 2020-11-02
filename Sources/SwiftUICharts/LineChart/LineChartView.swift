@@ -60,6 +60,7 @@ public struct LineChartView: View {
                 .fill(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
                 .frame(width: frame.width, height: 240, alignment: .center)
                 .shadow(color: self.style.dropShadowColor, radius: self.dropShadow ? 8 : 0)
+            
             VStack(alignment: .leading){
                 if(!self.showIndicatorDot){
                     VStack(alignment: .leading, spacing: 8){
@@ -88,7 +89,7 @@ public struct LineChartView: View {
                     .transition(.opacity)
                     .animation(.easeIn(duration: 0.1))
                     .padding([.leading, .top])
-                }else{
+                } else {
                     HStack{
                         Spacer()
                         Text("\(self.currentValue, specifier: self.valueSpecifier)")
