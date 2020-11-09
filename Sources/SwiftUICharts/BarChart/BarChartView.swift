@@ -53,7 +53,7 @@ public struct BarChartView : View {
                         .font(.headline)
                         .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.textColor : self.style.textColor)
                 } else {
-                    Text("\(self.currentValue, specifier: self.valueSpecifier)")
+                    dummyValueFormatter()
                         .font(.headline)
                         .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.textColor : self.style.textColor)
                 }
@@ -105,6 +105,22 @@ public struct BarChartView : View {
         )
             .gesture(TapGesture()
         )
+    }
+    
+    func dummyValueFormatter() -> Text {
+        var legendName = ""
+        if currentValue == 45 {
+            legendName = "Moderate Active Min."
+        } else if currentValue == 25 {
+            legendName = "Floors Climbed"
+        } else if currentValue == 15 {
+            legendName = "REM Sleep"
+        } else if currentValue == 10 {
+            legendName = "Bed Time"
+        } else if currentValue == 5 {
+            legendName = "Heart Rate"
+        }
+        return Text("\(currentValue, specifier: self.valueSpecifier): \(legendName)")
     }
     
     func getArrowOffset(touchLocation:CGFloat) -> Binding<CGFloat> {

@@ -72,7 +72,7 @@ public struct LineView: View {
                         
                         ForEach(self.data.dataArray) { data in
                             Line(data: data,
-                                 frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
+                                 frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 46, height: reader.frame(in: .local).height)),
                                  touchLocation: self.$indicatorLocation,
                                  showIndicator: self.$hideHorizontalLines,
                                  minDataValue: .constant(getMergedDataForLegend().onlyPoints().min()),
@@ -80,7 +80,7 @@ public struct LineView: View {
                                  showBackground: false,
                                  gradient: getLineGradient(of: data)
                             )
-                            .offset(x: 30, y: -20)
+                            .offset(x: 46, y: -20)
                             .onAppear(){
                                 self.showLegend = true
                             }
@@ -100,9 +100,9 @@ public struct LineView: View {
                 .gesture(DragGesture()
                 .onChanged({ value in
                     self.dragLocation = value.location
-                    self.indicatorLocation = CGPoint(x: max(value.location.x-30,0), y: 32)
+                    self.indicatorLocation = CGPoint(x: max(value.location.x-46,0), y: 32)
                     self.opacity = 1
-                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width-30, height: 240)
+                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width-46, height: 240)
                     self.hideHorizontalLines = true
                 })
                     .onEnded({ value in
