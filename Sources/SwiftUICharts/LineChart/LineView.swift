@@ -102,7 +102,7 @@ public struct LineView: View {
                     self.dragLocation = value.location
                     self.indicatorLocation = CGPoint(x: max(value.location.x-46,0), y: 32)
                     self.opacity = 1
-                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width-46, height: 240)
+                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width+32, height: 240)
                     self.hideHorizontalLines = true
                 })
                     .onEnded({ value in
