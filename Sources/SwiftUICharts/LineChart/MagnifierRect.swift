@@ -14,7 +14,9 @@ public struct MagnifierRect: View {
     @Binding var currentNumber1: Double
     @Binding var currentNumber2: Double
     
-    var valueSpecifier:String
+    @Binding var currentDate: String
+    
+    var valueSpecifier: String
     
     public var body: some View {
         ZStack{
@@ -28,6 +30,10 @@ public struct MagnifierRect: View {
                 Text("\(self.currentNumber2, specifier: valueSpecifier)")
                     .font(.headline)
                     .foregroundColor(Color(UIColor.label))
+                
+                Text("\(currentDate)")
+                    .font(.footnote)
+                    .foregroundColor(Color(UIColor.secondaryLabel))
             }
             .padding(.vertical, 12)
             

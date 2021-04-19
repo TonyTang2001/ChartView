@@ -10,6 +10,8 @@ import SwiftUI
 
 public struct LineView: View {
     @ObservedObject var data: ChartDataArray
+//    @Binding var showDate: Bool
+    public var dateArray: [String]
     public var title: String?
     public var legend: String?
     public var style: ChartStyle
@@ -26,6 +28,8 @@ public struct LineView: View {
     @State private var hideHorizontalLines: Bool = false
     
     public init(data: [[Double]],
+                showDate: Binding<Bool> = .constant(false),
+                dateArray: [String] = [],
                 title: String? = nil,
                 legend: String? = nil,
                 style: ChartStyle = Styles.lineChartStyleOne,
@@ -42,6 +46,8 @@ public struct LineView: View {
         self.style = style
         self.valueSpecifier = valueSpecifier!
         self.darkModeStyle = style.darkModeStyle != nil ? style.darkModeStyle! : Styles.lineViewDarkMode
+        self.dateArray = dateArray
+//        self.showDate = showDate
     }
     
     public var body: some View {
@@ -92,7 +98,7 @@ public struct LineView: View {
                     .frame(width: geometry.frame(in: .local).size.width, height: 240)
                     .offset(x: 0, y: 40)
                     
-                    MagnifierRect(currentNumber1: self.$currentDataNumbers[0], currentNumber2: self.$currentDataNumbers[1], valueSpecifier: self.valueSpecifier)
+                    MagnifierRect(currentNumber1: self.$currentDataNumbers[0], currentNumber2: self.$currentDataNumbers[1], currentDate: .constant("Date"), valueSpecifier: self.valueSpecifier)
                         .opacity(self.opacity)
                         .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
                 }
