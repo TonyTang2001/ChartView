@@ -16,6 +16,8 @@ public struct MagnifierRect: View {
     
     @Binding var currentDate: String
     
+    @State var showDate: Bool = false
+    
     var valueSpecifier: String
     
     public var body: some View {
@@ -31,12 +33,13 @@ public struct MagnifierRect: View {
                     .font(.headline)
                     .foregroundColor(Color(UIColor.label))
                 
-                Text("\(currentDate)")
-                    .font(.footnote)
-                    .foregroundColor(Color(UIColor.secondaryLabel))
+                if showDate {
+                    Text("\(currentDate)")
+                        .font(.footnote)
+                        .foregroundColor(Color(UIColor.secondaryLabel))
+                }
             }
             .padding(.vertical, 12)
-            
             
             if (self.colorScheme == .dark) {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)

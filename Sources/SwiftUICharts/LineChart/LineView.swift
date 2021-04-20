@@ -33,7 +33,7 @@ public struct LineView: View {
                 title: String? = nil,
                 legend: String? = nil,
                 style: ChartStyle = Styles.lineChartStyleOne,
-                valueSpecifier: String? = "%.1f") {
+                valueSpecifier: String? = "%.0f") {
         
         var chartDataArray = [ChartData]()
         
@@ -74,11 +74,10 @@ public struct LineView: View {
                         Legend(data: getMergedDataForLegend(),
                                frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
                             .transition(.opacity)
-                            .animation(Animation.easeOut(duration: 1).delay(1))
                         
                         ForEach(self.data.dataArray) { data in
                             Line(data: data,
-                                 frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 46, height: reader.frame(in: .local).height)),
+                                 frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 36, height: reader.frame(in: .local).height)),
                                  touchLocation: self.$indicatorLocation,
                                  showIndicator: self.$hideHorizontalLines,
                                  minDataValue: .constant(getMergedDataForLegend().onlyPoints().min()),
@@ -86,11 +85,11 @@ public struct LineView: View {
                                  showBackground: false,
                                  gradient: getLineGradient(of: data)
                             )
-                            .offset(x: 46, y: -20)
-                            .onAppear(){
+                            .offset(x: 28, y: -20)
+                            .onAppear() {
                                 self.showLegend = true
                             }
-                            .onDisappear(){
+                            .onDisappear() {
                                 self.showLegend = false
                             }
                         }
@@ -100,7 +99,7 @@ public struct LineView: View {
                     
                     MagnifierRect(currentNumber1: self.$currentDataNumbers[0], currentNumber2: self.$currentDataNumbers[1], currentDate: .constant("Date"), valueSpecifier: self.valueSpecifier)
                         .opacity(self.opacity)
-                        .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
+                        .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2-18, y: 36)
                 }
                 .frame(width: geometry.frame(in: .local).size.width, height: 240)
                 .gesture(DragGesture()
@@ -108,7 +107,7 @@ public struct LineView: View {
                     self.dragLocation = value.location
                     self.indicatorLocation = CGPoint(x: max(value.location.x-46,0), y: 32)
                     self.opacity = 1
-                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width+32, height: 240)
+                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width, height: 240)
                     self.hideHorizontalLines = true
                 })
                     .onEnded({ value in
