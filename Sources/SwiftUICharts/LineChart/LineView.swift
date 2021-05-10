@@ -10,7 +10,6 @@ import SwiftUI
 
 public struct LineView: View {
     @ObservedObject var data: ChartDataArray
-//    @Binding var showDate: Bool
     public var dateArray: [String]
     public var title: String?
     public var legend: String?
@@ -19,6 +18,7 @@ public struct LineView: View {
     public var valueSpecifier:String
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @State private var showMarks = true
     @State private var showLegend = true
     @State private var dragLocation:CGPoint = .zero
     @State private var indicatorLocation:CGPoint = .zero
@@ -28,7 +28,6 @@ public struct LineView: View {
     @State private var hideHorizontalLines: Bool = false
     
     public init(data: [[Double]],
-                showDate: Binding<Bool> = .constant(false),
                 dateArray: [String] = [],
                 title: String? = nil,
                 legend: String? = nil,
@@ -47,7 +46,6 @@ public struct LineView: View {
         self.valueSpecifier = valueSpecifier!
         self.darkModeStyle = style.darkModeStyle != nil ? style.darkModeStyle! : Styles.lineViewDarkMode
         self.dateArray = dateArray
-//        self.showDate = showDate
     }
     
     public var body: some View {
@@ -64,7 +62,8 @@ public struct LineView: View {
                             .font(.callout)
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.legendTextColor : self.style.legendTextColor)
                     }
-                }.offset(x: 0, y: 20)
+                }
+                .offset(x: 0, y: 20)
                 
                 ZStack{
                     GeometryReader{ reader in
@@ -96,6 +95,17 @@ public struct LineView: View {
                     }
                     .frame(width: geometry.frame(in: .local).size.width, height: 240)
                     .offset(x: 0, y: 40)
+                    
+                    if showMarks {
+                        Path { path in
+                            path.move(to: CGPoint(x: 350, y: 55))
+                            path.addLine(to: CGPoint(x: 350, y: 288))
+                            path.addLine(to: CGPoint(x: 347, y: 291))
+                            path.addLine(to: CGPoint(x: 353, y: 291))
+                            path.addLine(to: CGPoint(x: 350, y: 288))
+                        }
+                        .stroke(Color.pink, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round, dash: [5], dashPhase: 7))
+                    }
                     
                     MagnifierRect(currentNumber1: self.$currentDataNumbers[0], currentNumber2: self.$currentDataNumbers[1], currentDate: .constant("Date"), valueSpecifier: self.valueSpecifier)
                         .opacity(self.opacity)
