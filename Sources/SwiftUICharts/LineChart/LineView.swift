@@ -11,11 +11,12 @@ import SwiftUI
 public struct LineView: View {
     @ObservedObject var data: ChartDataArray
     public var dateArray: [String]
+    public var showTrendLine: Bool
     public var title: String?
     public var legend: String?
     public var style: ChartStyle
     public var darkModeStyle: ChartStyle
-    public var valueSpecifier:String
+    public var valueSpecifier: String
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var showMarks = true
@@ -29,6 +30,7 @@ public struct LineView: View {
     
     public init(data: [[Double]],
                 dateArray: [String] = [],
+                showTrendLine: Bool = false,
                 title: String? = nil,
                 legend: String? = nil,
                 style: ChartStyle = Styles.lineChartStyleOne,
@@ -39,7 +41,8 @@ public struct LineView: View {
         data.forEach { dataArray in
             chartDataArray.append(ChartData(points: dataArray))
         }
-        self.data = ChartDataArray(from: chartDataArray, of: [Styles.lineChartStyleOne.gradientColor, Styles.barChartStyleNeonBlueLight.gradientColor])
+        self.data = ChartDataArray(from: chartDataArray, of: [Styles.lineChartStyleOne.gradientColor, Styles.barChartStyleNeonBlueLight.gradientColor, GradientColor(start: .orange, end: .orange), GradientColor(start: .blue, end: .blue)])
+        self.showTrendLine = showTrendLine
         self.title = title
         self.legend = legend
         self.style = style
@@ -52,7 +55,7 @@ public struct LineView: View {
         GeometryReader{ geometry in
             VStack(alignment: .leading, spacing: 8) {
                 Group{
-                    if (self.title != nil){
+                    if (self.title != nil) {
                         Text(self.title!)
                             .font(.title)
                             .bold().foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.textColor : self.style.textColor)
