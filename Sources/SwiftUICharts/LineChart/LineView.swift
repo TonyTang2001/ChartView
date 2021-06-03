@@ -81,7 +81,7 @@ public struct LineView: View {
                             Line(data: data,
                                  frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 36, height: reader.frame(in: .local).height)),
                                  touchLocation: self.$indicatorLocation,
-                                 showIndicator: self.$hideHorizontalLines,
+                                 showIndicator: isTrendLine(currData: data),
                                  minDataValue: .constant(getMergedDataForLegend().onlyPoints().min()),
                                  maxDataValue: .constant(getMergedDataForLegend().onlyPoints().max()),
                                  showBackground: false,
@@ -129,6 +129,14 @@ public struct LineView: View {
                     })
                 )
             }
+        }
+    }
+    
+    func isTrendLine(currData: ChartData) -> Binding<Bool> {
+        if self.data.dataArray.firstIndex(of: currData)! > 1 {
+            return .constant(false)
+        } else {
+            return self.$hideHorizontalLines
         }
     }
     

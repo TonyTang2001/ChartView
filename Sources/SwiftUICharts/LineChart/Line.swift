@@ -100,7 +100,7 @@ public struct Line: View {
                 .stroke(LinearGradient(gradient: gradient.getGradient(), startPoint: .leading, endPoint: .trailing) ,style: StrokeStyle(lineWidth: 3, lineJoin: .round))
                 .rotationEffect(.degrees(180), anchor: .center)
                 .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-                .animation(animate ? Animation.easeOut(duration: 1.2).delay(Double(self.index)*0.3) : nil)
+                .animation(animate ? Animation.easeOut(duration: 0.6).delay(Double(self.index)*0.3) : nil)
                 .onAppear {
                     self.showFull = true
             }
