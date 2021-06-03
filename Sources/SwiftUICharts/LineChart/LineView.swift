@@ -41,7 +41,7 @@ public struct LineView: View {
         data.forEach { dataArray in
             chartDataArray.append(ChartData(points: dataArray))
         }
-        self.data = ChartDataArray(from: chartDataArray, of: [Styles.lineChartStyleOne.gradientColor, Styles.barChartStyleNeonBlueLight.gradientColor, GradientColor(start: .orange, end: .orange), GradientColor(start: .blue, end: .blue)])
+        self.data = ChartDataArray(from: chartDataArray, of: [GradientColor(start: .blue, end: .blue), GradientColor(start: .purple, end: .purple), GradientColor(start: .orange, end: .orange), GradientColor(start: .yellow, end: .yellow)])
         self.showTrendLine = showTrendLine
         self.title = title
         self.legend = legend
@@ -142,17 +142,46 @@ public struct LineView: View {
     }
     
     func getClosestDataPoint(toPoint: CGPoint, width:CGFloat, height: CGFloat) -> CGPoint {
-        let points1 = self.data.dataArray[0].onlyPoints()
-        let points2 = self.data.dataArray[1].onlyPoints()
+        var points1 = [Double]()
+        var points2 = [Double]()
+//        if self.data.dataArray.count >= 2 {
+//            points1 = self.data.dataArray[0].onlyPoints()
+//            points2 = self.data.dataArray[1].onlyPoints()
+//        } else if self.data.dataArray.count == 1 {
+//            points1 = self.data.dataArray[0].onlyPoints()
+//            points2 = self.data.dataArray[0].onlyPoints()
+//        }
+        points1 = self.data.dataArray[0].onlyPoints()
+        points2 = self.data.dataArray[1].onlyPoints()
         
-        let stepWidth: CGFloat = width / CGFloat(points1.count-1)
-        let stepHeight: CGFloat = height / CGFloat(points1.max()! + points1.min()!)
-        
-        let index:Int = Int(floor((toPoint.x-15)/stepWidth))
-        if (index >= 0 && index < points1.count){
-            self.currentDataNumbers = [points1[index], points2[index]]
-            return CGPoint(x: CGFloat(index)*stepWidth, y: CGFloat(points1[index])*stepHeight)
+        if points1.isEmpty {
+            if !points2.isEmpty {
+                points1 = points2
+            }
         }
+        
+        if points2.isEmpty {
+            if !points1.isEmpty {
+                points2 = points1
+            }
+        }
+        
+        if points1.isEmpty && points2.isEmpty {
+            points1 = [0]
+            points2 = [0]
+        }
+        
+        if !points1.isEmpty {
+            let stepWidth: CGFloat = width / CGFloat(points1.count-1)
+            let stepHeight: CGFloat = height / CGFloat(points1.max()! + points1.min()!)
+            
+            let index:Int = Int(floor((toPoint.x-15)/stepWidth))
+            if (index >= 0 && index < points1.count){
+                self.currentDataNumbers = [points1[index], points2[index]]
+                return CGPoint(x: CGFloat(index)*stepWidth, y: CGFloat(points1[index])*stepHeight)
+            }
+        }
+        
         return .zero
     }
     
